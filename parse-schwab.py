@@ -4,7 +4,7 @@ import re
 import regex_store
 import csv
 
-PATH_TO_BROKERAGE_STATEMENTS = "../SchwabStatements"
+PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab Roth IRA Statements/"
 
 #subtract 1 b/c PDF pages are 1-indexed
 SCHWAB_ACCOUNT_VALUE_PAGE = 3
@@ -76,8 +76,8 @@ for file in files:
     try:
         if file[-4:] == ".pdf": #last 4 chars
             # continue
-            print("now parsing {}".format(file))
-            parse_statement("Schwab", "../SchwabStatements/" + file)
+            print("now parsing {}, which is found at {}".format(file, PATH_TO_BROKERAGE_STATEMENTS + file))
+            parse_statement("Schwab", PATH_TO_BROKERAGE_STATEMENTS + file)
     except ValueError as err:
         print("opening file")
         print(err.args)
