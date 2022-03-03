@@ -4,11 +4,14 @@ import re
 import regex_store
 import csv
 
-PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab Roth IRA Statements/"
+# PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab Roth IRA Statements/"
+PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab 401k Statements/"
+
+IS_PCRA = True
 
 #subtract 1 b/c PDF pages are 1-indexed
-SCHWAB_ACCOUNT_VALUE_PAGE = 3
-SCHWAB_DEPOSIT_WITHDRAW_PAGE = 4
+SCHWAB_ACCOUNT_VALUE_PAGE = 3 - 1
+SCHWAB_PCRA_401K_ACCOUNT_VALUE_PAGE = 4 - 1
 
 entries = {}
 
@@ -31,8 +34,11 @@ def parse_statement(broker, pdf_path):
         pdf = pdftotext.PDF(f)
         pages = len(pdf)
 
-    try: 
-        account_value_pdf_page = pdf[SCHWAB_ACCOUNT_VALUE_PAGE - 1] 
+    try:
+        if IS_PCRA:
+            account_value_pdf_page = pdf[SCHWAB_PCRA_401K_ACCOUNT_VALUE_PAGE]
+        else: 
+            account_value_pdf_page = pdf[SCHWAB_ACCOUNT_VALUE_PAGE]
         result = re.search(regex_store.ACCOUNT_VALUE, account_value_pdf_page) #using capture groups
         date, account_value = result.groups()
         sort_friendly_date = parse_date(date)
