@@ -35,6 +35,7 @@ def parse_statement(broker, pdf_path):
         pages = len(pdf)
 
     try:
+        # get account value & date
         if IS_PCRA:
             account_value_pdf_page = pdf[SCHWAB_PCRA_401K_ACCOUNT_VALUE_PAGE]
         else: 
@@ -42,6 +43,7 @@ def parse_statement(broker, pdf_path):
         result = re.search(regex_store.ACCOUNT_VALUE, account_value_pdf_page) #using capture groups
         date, account_value = result.groups()
         sort_friendly_date = parse_date(date)
+
     except ValueError as err:
         print("Error with account value, date")
         print(err.args)
