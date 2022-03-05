@@ -40,23 +40,27 @@ def parse_statement(broker, pdf_path):
         friendly_date = "{}-{}".format(year, month)
 
         # 2 ways to find account value
+        # the first method is most accurate, but doesn't work all the time
+
         account_value_regex = "Portfolio Value\n\n\$[\d,]*\.\d\d\n\n(\$[\d,]*\.\d\d)"
         account_value_list = re.findall(account_value_regex, page)
 
-        if account_value_list: 
+        if account_value_list:
             account_value = account_value_list[0]
         else:
+            # known issue: 2021-06.pdf -- the order of the 4 x 2 is not same as others
             account_value_regex = "\$[\d,]*\.\d\d"
             account_value_list = re.findall(account_value_regex, page)
             
             if account_value_list:
+                # all statements before March 2020 have a different 3 rows x 2 cols;
+                # after then, it has 4 rows x 2 cols; 
+                # the entry on the bottom right shows last month's ending balance 
+
                 if int(year) < 2020 or (int(year) == 2020 and int(month) < 3):
                     account_value = account_value_list[5]
                 else:
-                    account_value = account_value_list[7] # the statement shows 4 rows x 2 cols; the 8th entry (so bottom right) shows last month's ending balance 
-
-
-
+                    account_value = account_value_list[7]
 
 
     except ValueError as err:
