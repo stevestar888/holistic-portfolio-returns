@@ -5,7 +5,7 @@ import regex_store
 import csv
 import datetime
 
-# apex is the clearing firm for Public, Firstrade, M1, Sofi, Webull, Ally, Bettermint, Axos, Wealthsimple, etc
+# Apex is the clearing firm for Public, Firstrade, M1, Sofi, Webull, Ally, Bettermint, Axos, Wealthsimple, etc
 # for the full list, see https://investorjunkie.com/stock-brokers/broker-clearing-firms/
 PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Public Statements/"
 
@@ -88,23 +88,34 @@ def parse_statement(broker, pdf_path):
         for page in range(pages - 1, -1, -1):
             text = pdf[page]
 
-            digit = "[\d,]*\.\d\d"
+            deposits_list = []
+            withdrawls_list = []
+            digit_with_optional_dollar = "\$?[\d,]*\.\d\d"
 
             # deposits
-            deposits_regex = "ACH DEPOSIT(?:\n|SEN\(\d*\)|CREDIT|DEBIT|PRICE|)*\$?({})".format(digit)
-            deposits_list = re.findall(deposits_regex, text)
+            normal_deposits_regex = "[^(XFER FFS TO CASH)|(XFER CASH FROM FFS)]\nACH DEPOSIT(?:\n|SEN\(\d*\)|CREDIT|DEBIT|PRICE|)*({})".format(digit_with_optional_dollar)
+            deposits_list = re.findall(normal_deposits_regex, text)
+
+            if not deposits_list:
+                deposits_with_ffs_regex = "[(XFER FFS TO CASH)|(XFER CASH FROM FFS)]\nACH DEPOSIT(?:\n|SEN\(\d*\)|CREDIT|DEBIT|PRICE|)*{}\n({})".format(digit_with_optional_dollar, digit_with_optional_dollar)
+                deposits_list = re.findall(deposits_with_ffs_regex, text)
             
             # withdrawls
-            withdrawls_regex = "ACH DISBURSEMENT(?:\n|SEN\(\d*\)|CREDIT|DEBIT|PRICE|)*\$?({})".format(digit)
-            withdrawls_list = re.findall(withdrawls_regex, text)
+            normal_withdrawls_regex = "[^(XFER FFS TO CASH)|(XFER CASH FROM FFS)]\nACH DISBURSEMENT(?:\n|SEN\(\d*\)|CREDIT|DEBIT|PRICE|)*({})".format(digit_with_optional_dollar)
+            withdrawls_list = re.findall(normal_withdrawls_regex, text)
 
+            if not withdrawls_list:
+                dwithdrawls_with_ffs_regex = "[(XFER FFS TO CASH)|(XFER CASH FROM FFS)]\nACH DISBURSEMENT(?:\n|SEN\(\d*\)|CREDIT|DEBIT|PRICE|)*{}\n({})".format(digit_with_optional_dollar, digit_with_optional_dollar)
+                withdrawls_list = re.findall(dwithdrawls_with_ffs_regex, text)
+
+            # ingest data
             if withdrawls_list or deposits_list:
                 has_triggered = True
                 
-                withdrawls_list = [amount.replace(",", "") for amount in withdrawls_list]
-                deposits_list = [amount.replace(",", "") for amount in deposits_list]
-                withdrawal_amount += sum(map(float, withdrawls_list))
-                deposit_amount += sum(map(float, deposits_list))
+                formatted_withdrawls_list = [float(amount.replace(",", "").replace("$", "")) for amount in withdrawls_list]
+                formatted_deposits_list = [float(amount.replace(",", "").replace("$", "")) for amount in deposits_list]
+                withdrawal_amount += sum(formatted_withdrawls_list)
+                deposit_amount += sum(formatted_deposits_list)
             elif has_triggered: #if there are no more withdrawls or deposits listed, and we're already seen the section for them, no more need to look
                 break
             
@@ -124,7 +135,7 @@ for file in files:
         if file[-4:] == ".pdf": #last 4 chars
             # continue
             print("now parsing {}, which is found at {}".format(file, PATH_TO_BROKERAGE_STATEMENTS + file))
-            parse_statement("Schwab", PATH_TO_BROKERAGE_STATEMENTS + file)
+            parse_statement("Apex", PATH_TO_BROKERAGE_STATEMENTS + file)
     except ValueError as err:
         print("opening file")
         print(err.args)
@@ -141,4 +152,4 @@ with open('data-apex.csv', 'w') as csv_writer:
         payload = data
         payload.insert(0, date)
         writer.writerow(payload)
-        # print(date, data)
+        print(date, data)
