@@ -48,7 +48,7 @@ def parse_statement(broker, pdf_path):
         raw_date = "".join(date_builder)
         ending_date = raw_date.split("-")[1] #the latter half
 
-        formated_date = datetime.datetime.strptime(ending_date, ' %B %d, %Y').strftime('%Y-%m')
+        formatted_date = datetime.datetime.strptime(ending_date, ' %B %d, %Y').strftime('%Y-%m')
 
         digit_with_dollar = "\$[\d,]*\.\d\d"
         digit = "-?[\d,]*\.\d\d"
@@ -77,6 +77,8 @@ def parse_statement(broker, pdf_path):
         print("Error with account value, date")
         print(err.args)
 
+    if formatted_date == "2021-12":
+        print("yes")
 
     try:
         withdrawal_amount = 0
@@ -98,6 +100,9 @@ def parse_statement(broker, pdf_path):
 
             if withdrawls_list or deposits_list:
                 has_triggered = True
+                
+                withdrawls_list = [amount.replace(",", "") for amount in withdrawls_list]
+                deposits_list = [amount.replace(",", "") for amount in deposits_list]
                 withdrawal_amount += sum(map(float, withdrawls_list))
                 deposit_amount += sum(map(float, deposits_list))
             elif has_triggered: #if there are no more withdrawls or deposits listed, and we're already seen the section for them, no more need to look
@@ -108,7 +113,7 @@ def parse_statement(broker, pdf_path):
         print("deposit / withdraw")
         print(err.args)
 
-    bookkeep_month_entry(broker, formated_date, account_value, deposit_amount, withdrawal_amount)
+    bookkeep_month_entry(broker, formatted_date, account_value, deposit_amount, withdrawal_amount)
 
 
 files = os.listdir(PATH_TO_BROKERAGE_STATEMENTS)
@@ -136,3 +141,4 @@ with open('data-apex.csv', 'w') as csv_writer:
         payload = data
         payload.insert(0, date)
         writer.writerow(payload)
+        # print(date, data)
