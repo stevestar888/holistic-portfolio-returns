@@ -7,7 +7,7 @@ import datetime
 
 # Apex is the clearing firm for Public, Firstrade, M1, Sofi, Webull, Ally, Bettermint, Axos, Wealthsimple, etc
 # for the full list, see https://investorjunkie.com/stock-brokers/broker-clearing-firms/
-PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Public Statements/"
+PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Firstrade Statements/"
 
 #subtract 1 b/c PDF pages are 1-indexed
 ACCOUNT_VALUE_PAGE = 1 - 1
@@ -76,9 +76,6 @@ def parse_statement(broker, pdf_path):
     except ValueError as err:
         print("Error with account value, date")
         print(err.args)
-
-    if formatted_date == "2021-12":
-        print("yes")
 
     try:
         withdrawal_amount = 0
@@ -152,4 +149,4 @@ with open('data-apex.csv', 'w') as csv_writer:
         payload = data
         payload.insert(0, date)
         writer.writerow(payload)
-        print(date, data)
+        # print(date, data)
