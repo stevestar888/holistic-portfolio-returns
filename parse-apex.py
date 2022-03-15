@@ -5,8 +5,7 @@ import regex_store
 import csv
 import datetime
 
-# Apex is the clearing firm for Public, Firstrade, M1, Sofi, Webull, Ally, Bettermint, Axos, Wealthsimple, etc
-# for the full list, see https://investorjunkie.com/stock-brokers/broker-clearing-firms/
+
 PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Public Statements/"
 
 #subtract 1 b/c PDF pages are 1-indexed
