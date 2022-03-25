@@ -5,8 +5,8 @@ import regex_store
 import csv
 import datetime
 
-PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Fidelity Statements/2021 Monthly/"
-
+FILE_PATH_TO_BROKERAGE_STATEMENTS = ["../Brokerage Statements/Fidelity Statements/2021 Monthly/",
+"../Brokerage Statements/Fidelity Statements/2022 Monthly/"]
 """
 
 
@@ -45,8 +45,8 @@ FIDELITY_ACCOUNT_VALUE_PAGE = 1 - 1
 
 entries = {}
 
-def bookkeep_month_entry(broker, date, account_value, deposits, withdraws):
-    entries[date] = [deposits, withdraws, account_value]
+def bookkeep_month_entry(broker, date, account_value, deposits, withdraws, account_num):
+    entries[(account_num, date)] = [deposits, withdraws, account_value]
 
 
 def parse_statement(broker, pdf_path):
@@ -161,18 +161,18 @@ def parse_statement(broker, pdf_path):
             ending_account_val_including_accured_interest = next(next_digit_iterator)
 
 
-        def verify_and_float_num(num):
+        def verify_and_caste_to_float(num):
             if num:
                 return float(num)
             else:
                 return 0
 
         # note: the regex did not take into account (+) or (-) nums; this is because their signs are all intuitive
-        beginning_account_val = verify_and_float_num(begn_account_val_this_period)
-        account_val_change = verify_and_float_num(change_in_investment_val_this_period)
-        contributions = verify_and_float_num(additions_this_period)
-        withdrawals = verify_and_float_num(subtractions_this_period) * -1
-        account_val = verify_and_float_num(ending_account_val_this_period)
+        beginning_account_val = verify_and_caste_to_float(begn_account_val_this_period)
+        account_val_change = verify_and_caste_to_float(change_in_investment_val_this_period)
+        contributions = verify_and_caste_to_float(additions_this_period)
+        withdrawals = verify_and_caste_to_float(subtractions_this_period) * -1
+        account_val = verify_and_caste_to_float(ending_account_val_this_period)
 
         added_together = beginning_account_val + account_val_change + contributions + withdrawals
         if round(added_together, 2) == account_val:
@@ -184,23 +184,30 @@ def parse_statement(broker, pdf_path):
             else:
                 print("didn't add up")
 
-        print(contributions, withdrawals, account_val)
+        # back out transaction costs, fees, and charges from withdrawals
+        # since withdrawals is a (-) num, we add
+        if transactions_costs_fees_charges_entry:
+            withdrawals += verify_and_caste_to_float(transactions_costs_fees_charges_this_period)
 
-    bookkeep_month_entry(broker, formatted_date, account_val, contributions, withdrawals)
+
+        account_num_regex = "Account Number: ([A-Z0-9]*-[A-Z0-9]*)"
+        account_num = re.findall(account_num_regex, txt)[0]
+        print(account_num)
+
+    bookkeep_month_entry(broker, formatted_date, account_val, contributions, withdrawals, account_num)
 
 
-files = os.listdir(PATH_TO_BROKERAGE_STATEMENTS)
-print(files)
-
-for file in files:
-    try:
-        if file[-4:] == ".pdf": #last 4 chars
-            # continue
-            print("now parsing {}, which is found at {}".format(file, PATH_TO_BROKERAGE_STATEMENTS + file))
-            parse_statement("Fid", PATH_TO_BROKERAGE_STATEMENTS + file)
-    except ValueError as err:
-        print("opening file")
-        print(err.args)
+for file_path in FILE_PATH_TO_BROKERAGE_STATEMENTS:
+    files = os.listdir(file_path)
+    for file in files:
+        try:
+            if file[-4:] == ".pdf": #last 4 chars
+                # continue
+                print("now parsing {}, which is found at {}".format(file, file_path + file))
+                parse_statement("Fid", file_path + file)
+        except ValueError as err:
+            print("opening file")
+            print(err.args)
 
 
 header = ['year-month', 'deposits', 'withdrawals', 'ending_balance']
