@@ -1,7 +1,7 @@
 import pdftotext
 import os
 import re
-import regex_store
+import constants
 import csv
 import datetime
 
@@ -41,13 +41,13 @@ def parse_statement(broker, pdf_path):
         formatted_date = datetime.datetime.strptime(ending_date, ' %B %d, %Y').strftime('%Y-%m')
 
 
-        account_value = re.findall(regex_store.APEX_ACCOUNT_VALUE_VERSION_1, account_value_pdf_page)
+        account_value = re.findall(constants.APEX_ACCOUNT_VALUE_VERSION_1, account_value_pdf_page)
         if not account_value:
-            account_value = re.findall(regex_store.APEX_ACCOUNT_VALUE_VERSION_2, account_value_pdf_page)
+            account_value = re.findall(constants.APEX_ACCOUNT_VALUE_VERSION_2, account_value_pdf_page)
         if not account_value:
-            account_value = re.findall(regex_store.APEX_ACCOUNT_VALUE_VERSION_3, account_value_pdf_page)
+            account_value = re.findall(constants.APEX_ACCOUNT_VALUE_VERSION_3, account_value_pdf_page)
         if not account_value:
-            account_value = re.findall(regex_store.APEX_ACCOUNT_VALUE_VERSION_4, account_value_pdf_page)
+            account_value = re.findall(constants.APEX_ACCOUNT_VALUE_VERSION_4, account_value_pdf_page)
 
         account_value = account_value[0]
 
@@ -70,14 +70,14 @@ def parse_statement(broker, pdf_path):
             withdrawals_list = []
 
             # deposits
-            deposits_list = re.findall(regex_store.APEX_DEPOSITS_NORMAL_VERSION, text)
+            deposits_list = re.findall(constants.APEX_DEPOSITS_NORMAL_VERSION, text)
             if not deposits_list:
-                deposits_list = re.findall(regex_store.APEX_DEPOSITS_FFS_VERSION, text)
+                deposits_list = re.findall(constants.APEX_DEPOSITS_FFS_VERSION, text)
             
             # withdrawals
-            withdrawals_list = re.findall(regex_store.APEX_WITHDRAWALS_NORMAL_VERSION, text)
+            withdrawals_list = re.findall(constants.APEX_WITHDRAWALS_NORMAL_VERSION, text)
             if not withdrawals_list:
-                withdrawals_list = re.findall(regex_store.APEX_WITHDRAWALS_FFS_VERSION, text)
+                withdrawals_list = re.findall(constants.APEX_WITHDRAWALS_FFS_VERSION, text)
 
             # tally deposits & withdrawals
             if withdrawals_list or deposits_list:

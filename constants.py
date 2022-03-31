@@ -1,27 +1,43 @@
-# note: in the examples, the last line is where the captures groups are capturing (unless otherwise noted)
+DIGIT = "[\d,]*\.\d\d"
+DIGIT_WITH_OPTIONAL_DOLLAR = "\$?[\d,]*\.\d\d"
+DIGIT_WITH_OPTIONAL_NEGATIVE_SIGN = "-?[\d,]*\.\d\d"
 
-ACCOUNT_VALUE = "Account Value as of (\d\d\/\d\d\/\d\d\d\d):\$ ([\d,]*.\d\d)"
+CSV_HEADER = ['year-month', 'deposits', 'withdrawals', 'ending_balance']
+# note: the examples under regexes demonstrate one instance of the regex match;
+#   the last line is where the captures groups are capturing (unless otherwise noted)
+
+# where you see multiple regexes for deposits or withdraws (e.g., SCHWAB_DEPOSITS_VER1, SCHWAB_DEPOSITS_VER2),
+# that's because the order of the actual text after converting from PDF to text can be jumbled around.
+# As a result, the location of #s are not always consistent. Through manual testing, I've found
+# that there are certain locations where deposits or withdraws are most likely to be found. For example,
+# with Schwab, deposits are often right after "Deposits and other Cash Credits"; however, when that's not
+# the case, I've had to create a more general regex to capture the value. The more general regex has the potential of capturing the wrong value, so it's a trade off. Overall, I start with a very specific regex. If nothing is captured, then more general regexes are used to find the right value.
+
+################################
+# ----------- Schwab -----------
+################################
+
+# subtract 1 b/c PDF pages are 1-indexed
+SCHWAB_ACCOUNT_VALUE_PAGE = 3 - 1
+SCHWAB_PCRA_401K_ACCOUNT_VALUE_PAGE = 4 - 1
+
+
+SCHWAB_ACCOUNT_VALUE = "Account Value as of (\d\d\/\d\d\/\d\d\d\d):\$ ([\d,]*.\d\d)"
 """
-Ex:
-
 Account Value as of 11/30/2021:$ 36,600.61
 capture groups:     ^            ^
 """
 
 
-DEPOSITS = "Deposits and other Cash Credits\n\n([\d,]*.\d\d)"
-"""
-Ex: 2020-08
-
+SCHWAB_DEPOSITS = "Deposits and other Cash Credits\n\n([\d,]*.\d\d)"
+""" (from 2020-08)
 Deposits and other Cash Credits
 
 0.00
 """
 
-DEPOSITS2 = "Deposits and other Cash Credits\nInvestments Sold\n\nThis Period\n\nYear to Date\n\n\$ [\d,]*.\d\d\n\n\$ [\d,]*.\d\d\n\n([\d,]*.\d\d)"
+SCHWAB_DEPOSITS2 = "Deposits and other Cash Credits\nInvestments Sold\n\nThis Period\n\nYear to Date\n\n\$ [\d,]*.\d\d\n\n\$ [\d,]*.\d\d\n\n([\d,]*.\d\d)"
 """
-Ex:
-
 Deposits and other Cash Credits
 Investments Sold
 
@@ -37,27 +53,21 @@ $ 0,00
 """
 
 
-WITHDRAWS = "Withdrawals and other Debits\n\n([\d,]*.\d\d)"
-"""
-Ex: 2020-08
-
+SCHWAB_WITHDRAWS = "Withdrawals and other Debits\n\n([\d,]*.\d\d)"
+""" (from 2020-08)
 Withdrawals and other Debits
 
 0.00
 """
 
-
-WITHDRAWS2 = "Investments Purchased\n\n([\d,]*.\d\d)"
+SCHWAB_WITHDRAWS2 = "Investments Purchased\n\n([\d,]*.\d\d)"
 """
-Ex:
-
 Investments Purchased
 
 0.00
 """
 
-
-WITHDRAWS3 = "([\d,]*.\d\d)\n\n[\d,]*.\d\d\n\nTotal Cash Transaction Detail\n\n\([\d,]*.\d\d\)\n\n\([\d,]*.\d\d\)\n\nEnding Cash \*\n\n\$ "
+SCHWAB_WITHDRAWS3 = "([\d,]*.\d\d)\n\n[\d,]*.\d\d\n\nTotal Cash Transaction Detail\n\n\([\d,]*.\d\d\)\n\n\([\d,]*.\d\d\)\n\nEnding Cash \*\n\n\$ "
 """
 Ex: 2020-09
 
@@ -76,8 +86,6 @@ Ending Cash *
 $ 
 """
 
-DIGIT_WITH_OPTIONAL_DOLLAR = "\$?[\d,]*\.\d\d"
-DIGIT_WITH_OPTIONAL_NEGATIVE_SIGN = "-?[\d,]*\.\d\d"
 
 # the first regex should catch the majority of the account values.
 # however, it's not perfect, so we need additional regexes.

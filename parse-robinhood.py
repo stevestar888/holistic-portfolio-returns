@@ -1,7 +1,7 @@
 import pdftotext
 import os
 import re
-import regex_store
+import constants
 import csv
 
 # unable to support deposit & withdrawls right now -- only account value

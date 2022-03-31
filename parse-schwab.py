@@ -1,17 +1,13 @@
 import pdftotext
 import os
 import re
-import regex_store
+import constants
 import csv
 
 # PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab Roth IRA Statements/"
 PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab 401k Statements/"
 
 IS_PCRA = True
-
-#subtract 1 b/c PDF pages are 1-indexed
-SCHWAB_ACCOUNT_VALUE_PAGE = 3 - 1
-SCHWAB_PCRA_401K_ACCOUNT_VALUE_PAGE = 4 - 1
 
 entries = {}
 
@@ -37,10 +33,10 @@ def parse_statement(broker, pdf_path):
     try:
         # get account value & date
         if IS_PCRA:
-            account_value_pdf_page = pdf[SCHWAB_PCRA_401K_ACCOUNT_VALUE_PAGE]
+            account_value_pdf_page = pdf[constants.SCHWAB_PCRA_401K_ACCOUNT_VALUE_PAGE]
         else: 
-            account_value_pdf_page = pdf[SCHWAB_ACCOUNT_VALUE_PAGE]
-        result = re.search(regex_store.ACCOUNT_VALUE, account_value_pdf_page) #using capture groups
+            account_value_pdf_page = pdf[constants.SCHWAB_ACCOUNT_VALUE_PAGE]
+        result = re.search(constants.SCHWAB_ACCOUNT_VALUE, account_value_pdf_page) #using capture groups
         date, account_value = result.groups()
         sort_friendly_date = parse_date(date)
 
@@ -91,11 +87,9 @@ for file in files:
         print(err.args)
 
 
-header = ['year-month', 'deposits', 'withdrawals', 'ending_balance']
-
-with open('schwab-data.csv', 'w') as csv_writer:
+with open('data-schwab.csv', 'w') as csv_writer:
     writer = csv.writer(csv_writer)
-    writer.writerow(header)
+    writer.writerow(constants.CSV_HEADER)
 
     # write the data
     for date, data in sorted(entries.items()):
