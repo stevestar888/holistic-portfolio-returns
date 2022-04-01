@@ -89,7 +89,7 @@ for file in files:
 
 header = ['year-month', 'deposits', 'withdrawals', 'ending_balance']
 
-with open('robinhood-data.csv', 'w') as csv_writer:
+with open('data-robinhood.csv', 'w') as csv_writer:
     writer = csv.writer(csv_writer)
     writer.writerow(header)
 

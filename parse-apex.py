@@ -48,8 +48,12 @@ def parse_statement(broker, pdf_path):
             account_value = re.findall(constants.APEX_ACCOUNT_VALUE_VERSION_3, account_value_pdf_page)
         if not account_value:
             account_value = re.findall(constants.APEX_ACCOUNT_VALUE_VERSION_4, account_value_pdf_page)
-
-        account_value = account_value[0]
+        
+        if account_value:
+            account_value = account_value[0]
+        else:
+            # TODO
+            pass
 
     except ValueError as err:
         print("Error with account value or date")

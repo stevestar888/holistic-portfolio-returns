@@ -34,9 +34,9 @@ Some statements have this section, followed by the #s associated with them
 After some entries, there could be an asterisk. 
 The `Accrued Interest (AI)` and `Ending Account Value Incl. AI` are only on some statements.
 
-There could be entries for `Additions` and `Subtractions`. If Subtractions is an entry, then there could be also an entry for “Transaction Costs, Fees & Charges”
+There could be entries for `Additions` and `Subtractions`. If Subtractions is an entry, then there could be also an entry for `Transaction Costs, Fees & Charges`
 
-The account value is from the entry for “Ending Account Value”
+The account value is from the entry for `Ending Account Value`
 
 """
 

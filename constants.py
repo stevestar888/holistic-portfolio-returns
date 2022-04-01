@@ -3,6 +3,12 @@ DIGIT_WITH_OPTIONAL_DOLLAR = "\$?[\d,]*\.\d\d"
 DIGIT_WITH_OPTIONAL_NEGATIVE_SIGN = "-?[\d,]*\.\d\d"
 
 CSV_HEADER = ['year-month', 'deposits', 'withdrawals', 'ending_balance']
+
+HEADER_DATE_INDEX = 0
+HEADER_DEPOSIT_INDEX = 1
+HEADER_WITHDRAWALS_INDEX = 2
+HEADER_ACCOUNT_VALUE_INDEX = 3
+
 # note: the examples under regexes demonstrate one instance of the regex match;
 #   the last line is where the captures groups are capturing (unless otherwise noted)
 
