@@ -8,9 +8,6 @@ import datetime
 
 PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Public Statements/"
 
-#subtract 1 b/c PDF pages are 1-indexed
-ACCOUNT_VALUE_PAGE = 1 - 1
-
 entries = {}
 
 def bookkeep_month_entry(broker, date, account_value, deposits, withdraws):
@@ -25,7 +22,7 @@ def parse_statement(broker, pdf_path):
 
     # get account value & date
     try:
-        account_value_pdf_page = pdf[ACCOUNT_VALUE_PAGE]
+        account_value_pdf_page = pdf[constants.APEX_ACCOUNT_VALUE_PAGE]
 
         # get the first line; ex: "January 1, 2021 - January 31, 2021"
         date_builder = []
@@ -115,11 +112,9 @@ for file in files:
         print("Error opening file '{}'".format(file))
 
 
-header = ['year-month', 'deposits', 'withdrawals', 'ending_balance']
-
 with open('data-apex.csv', 'w') as csv_writer:
     writer = csv.writer(csv_writer)
-    writer.writerow(header)
+    writer.writerow(constants.CSV_HEADER)
 
     # write the data
     for date, data in sorted(entries.items()):

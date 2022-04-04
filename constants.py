@@ -23,8 +23,7 @@ HEADER_ACCOUNT_VALUE_INDEX = 3
 # ----------- Schwab -----------
 ################################
 
-# subtract 1 b/c PDF pages are 1-indexed
-SCHWAB_ACCOUNT_VALUE_PAGE = 3 - 1
+SCHWAB_ACCOUNT_VALUE_PAGE = 3 - 1 # subtract 1 b/c PDF pages are 1-indexed
 SCHWAB_PCRA_401K_ACCOUNT_VALUE_PAGE = 4 - 1
 
 
@@ -92,10 +91,16 @@ Ending Cash *
 $ 
 """
 
+#################################
+# -------- Apex Brokers ---------
+#################################
 
-# the first regex should catch the majority of the account values.
-# however, it's not perfect, so we need additional regexes.
-# as the regex versions progress, they get more and more specific to catch edge cases.
+APEX_ACCOUNT_VALUE_PAGE = 1 - 1 # subtract 1 b/c PDF pages are 1-indexed
+
+# The first regex should catch the majority of the account values.
+# However, some cases will not be caugh, so we need additional regexes.
+# As the regex versions progress, they get less specific (and therefore more prone to error),
+# so that's why the regexes are introduced in a specific order.
 
 # use "?:" for non-capturing group
 APEX_ACCOUNT_VALUE_VERSION_1 = "{}\n\n{}\n\n{}\n\n\$({})\n\n(?:NET ACCOUNT BALANCE|Total Equity Holdings)".format(DIGIT_WITH_OPTIONAL_NEGATIVE_SIGN, DIGIT_WITH_OPTIONAL_NEGATIVE_SIGN, DIGIT_WITH_OPTIONAL_DOLLAR, DIGIT_WITH_OPTIONAL_NEGATIVE_SIGN)
