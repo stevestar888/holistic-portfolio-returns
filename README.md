@@ -15,6 +15,9 @@ Currently, it supports supports: \
 *Apex is the clearing firm for Public, Firstrade, M1, Sofi, Webull, Ally, Bettermint, Axos, Wealthsimple, etc. For the full list, see https://investorjunkie.com/stock-brokers/broker-clearing-firms/
 
 
+Planning to support: \
+• TDAmeritrade \
+• Vanguard
 
 
 Just update PATH_TO_BROKERAGE_STATEMENTS with the folder containing the PDFs of Schwab statements (they can have any name)
