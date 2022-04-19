@@ -7,6 +7,7 @@ import datetime
 
 
 PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Public Statements/"
+# PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Firstrade Statements/"
 
 entries = {}
 
