@@ -29,8 +29,9 @@ stage 2 of the project: calculating returns. We can benchmark the portfolio agai
 
 # Credits
 
-PDF extraction via the pdf-to-text library:
-https://pypi.org/project/pdftotext/#description
+PDF extraction via the pdf-to-text library \
+(You probably don't have this and should consult this website for installation instructions: https://pypi.org/project/pdftotext/) \
+`pip3 install pdftotext`
 
 Financial Data pull (for Index-tracking ETFs):
 https://github.com/ranaroussi/yfinance
