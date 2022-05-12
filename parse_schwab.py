@@ -4,10 +4,12 @@ import re
 import constants
 import csv
 
-# PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab Roth IRA Statements/"
-PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab 401k Statements/"
+PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab Roth IRA Statements/"
+# PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Dad Taxable/"
 
-IS_PCRA = True
+# PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab 401k Statements/"
+IS_PCRA = False
+
 
 entries = {}
 
@@ -37,8 +39,14 @@ def parse_statement(broker, pdf_path):
         else: 
             account_value_pdf_page = pdf[constants.SCHWAB_ACCOUNT_VALUE_PAGE]
         result = re.search(constants.SCHWAB_ACCOUNT_VALUE, account_value_pdf_page) #using capture groups
-        date, account_value = result.groups()
-        sort_friendly_date = parse_date(date)
+
+        if result:
+            date, account_value = result.groups()
+            parsed_date = parse_date(date)
+        else:
+            date = "-"
+            account_value = "-"
+            parsed_date = "-"
 
     except ValueError as err:
         print("Error with account value, date")
@@ -70,7 +78,7 @@ def parse_statement(broker, pdf_path):
         print("deposit / withdraw")
         print(err.args)
 
-    bookkeep_month_entry(broker, sort_friendly_date, account_value, deposit_amount, withdrawal_amount)
+    bookkeep_month_entry(broker, parsed_date, account_value, deposit_amount, withdrawal_amount)
 
 
 files = os.listdir(PATH_TO_BROKERAGE_STATEMENTS)
