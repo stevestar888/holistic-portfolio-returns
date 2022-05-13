@@ -142,3 +142,39 @@ ACH DEPOSIT
 0.84
 250.00
 """
+
+
+MONEY_WEIGHT_RETURNS_EXAMPLE = """
+Ex1: Starting Balance = 100, Ending Balance = 1000
+Holding Period #		Deposits		Withdrawals
+1						1000			0
+2						0				50
+3						0				100
+4						20				200
+
+inflows: 100 + 1000 + 20 = 1120
+outflows: -50 + -100 + -200 + -1000 = -1350
+
+Calculations
+100 						# initial account balance
++ 1000 / (1 + IRR)^1 
+- 50 / (1 + IRR)^2
+- 100 / (1 + IRR)^3
++ 20 / (1 + IRR)^4  -  200 / (1 + IRR)^4
+=
+1000 / (1 + IRR)^5	        # ending account balance
+
+
+Ex2: Starting Balance = 0, Ending Balance = 264
+Holding Period #		Deposits		Withdrawals
+1						100				0
+2						118				0
+
+Calculations
+100 						# initial account balance
++ 118 / (1 + IRR)^1 
+=
+264 / (1 + IRR)^2		    # ending account balance
+
+IRR = 13.86%
+"""
