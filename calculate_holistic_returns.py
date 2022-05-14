@@ -1,8 +1,8 @@
 from numpy import average
 import constants
 import csv
-import money_weighted_returns
-import scenario_analysis_returns
+import calc_money_weighted_returns
+import calc_scenario_analysis
 
 CSV_FILE_TO_READ = "data-schwab.csv"
 SHOW_DEFINITIONS = True
@@ -155,7 +155,7 @@ with open(CSV_FILE_TO_READ.split('.csv')[0] + ".txt", 'w') as writer:
 
 
 
-    money_weighted_return = money_weighted_returns.calc_money_weighted_return(starting_balance, cash_flows, ending_balance)
+    money_weighted_return = calc_money_weighted_returns.calc_money_weighted_return(starting_balance, cash_flows, ending_balance)
     write("Money-Weighted return: {}%".format(money_weighted_return), 2)
 
     if SHOW_DEFINITIONS:
