@@ -5,12 +5,9 @@ import constants
 import csv
 import datetime
 
-FILE_PATH_TO_BROKERAGE_STATEMENTS = ["../Brokerage Statements/Fidelity Statements/2021 Monthly/",
-"../Brokerage Statements/Fidelity Statements/2022 Monthly/"]
+
+
 """
-
-
-
 
 Luckily, all of the account value and withdrawal/deposit information is on the first page.
 Unfortunately, the statements has some inconsistencies. Some statements have this near the top:
@@ -45,11 +42,11 @@ FIDELITY_ACCOUNT_VALUE_PAGE = 1 - 1
 
 entries = {}
 
-def bookkeep_month_entry(broker, date, account_value, deposits, withdraws, account_num):
+def bookkeep_month_entry(date, account_value, deposits, withdraws, account_num):
     entries[(account_num, date)] = [deposits, withdraws, account_value]
 
 
-def parse_statement(broker, pdf_path):
+def parse_statement(pdf_path):
     # Load your PDF
     with open(pdf_path, "rb") as f:
         pdf = pdftotext.PDF(f)
@@ -194,30 +191,6 @@ def parse_statement(broker, pdf_path):
         account_num = re.findall(account_num_regex, txt)[0]
         print(account_num)
 
-    bookkeep_month_entry(broker, formatted_date, account_val, contributions, withdrawals, account_num)
-
-
-for file_path in FILE_PATH_TO_BROKERAGE_STATEMENTS:
-    files = os.listdir(file_path)
-    for file in files:
-        try:
-            if file[-4:] == ".pdf": #last 4 chars
-                # continue
-                print("now parsing {}, which is found at {}".format(file, file_path + file))
-                parse_statement("Fid", file_path + file)
-        except ValueError as err:
-            print("opening file")
-            print(err.args)
-
-
-header = ['year-month', 'deposits', 'withdrawals', 'ending_balance']
-
-with open('data-fidelity.csv', 'w') as csv_writer:
-    writer = csv.writer(csv_writer)
-    writer.writerow(header)
-
-    # write the data
-    for date, data in sorted(entries.items()):
-        payload = data
-        payload.insert(0, date)
-        writer.writerow(payload)
+    key = (account_num, formatted_date) #tuple so it can be the key in a dict
+    payload = [contributions, withdrawals, account_val]
+    return (key, payload)

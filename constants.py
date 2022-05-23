@@ -144,7 +144,7 @@ ACH DEPOSIT
 """
 
 
-MONEY_WEIGHT_RETURNS_EXAMPLE = """
+MONEY_WEIGHTED_RETURNS_EXAMPLE = """
 Ex1: Starting Balance = 100, Ending Balance = 1000
 Holding Period #		Deposits		Withdrawals
 1						1000			0

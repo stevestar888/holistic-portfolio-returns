@@ -1,22 +1,10 @@
 import pdftotext
-import os
 import re
 import constants
-import csv
 import datetime
 
 
-PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Public Statements/"
-# PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Firstrade Statements/"
-
-entries = {}
-
-def bookkeep_month_entry(broker, date, account_value, deposits, withdraws):
-    entries[date] = [deposits, withdraws, account_value]
-    
-
-def parse_statement(broker, pdf_path):
-    # Load your PDF
+def parse_statement(pdf_path):
     with open(pdf_path, "rb") as f:
         pdf = pdftotext.PDF(f)
         pages = len(pdf)
@@ -97,29 +85,29 @@ def parse_statement(broker, pdf_path):
     except ValueError as err:
         print("Error with getting the deposit / withdraw: statement for {}".format(formatted_date))
 
-    bookkeep_month_entry(broker, formatted_date, account_value, deposit_amount, withdrawal_amount)
+    return (formatted_date, [ deposit_amount, withdrawal_amount, account_value])
 
 
-files = os.listdir(PATH_TO_BROKERAGE_STATEMENTS)
-print(files)
+# files = os.listdir(PATH_TO_BROKERAGE_STATEMENTS)
+# print(files)
 
-for file in files:
-    try:
-        if file[-4:] == ".pdf": #last 4 chars
-            # continue
-            print("now parsing {}, which is found at {}".format(file, PATH_TO_BROKERAGE_STATEMENTS + file))
-            parse_statement("Apex", PATH_TO_BROKERAGE_STATEMENTS + file)
-    except ValueError as err:
-        print("Error opening file '{}'".format(file))
+# for file in files:
+#     try:
+#         if file[-4:] == ".pdf": #last 4 chars
+#             # continue
+#             print("now parsing {}, which is found at {}".format(file, PATH_TO_BROKERAGE_STATEMENTS + file))
+#             parse_statement("Apex", PATH_TO_BROKERAGE_STATEMENTS + file)
+#     except ValueError as err:
+#         print("Error opening file '{}'".format(file))
 
 
-with open('data-apex.csv', 'w') as csv_writer:
-    writer = csv.writer(csv_writer)
-    writer.writerow(constants.CSV_HEADER)
+# with open('data-apex.csv', 'w') as csv_writer:
+#     writer = csv.writer(csv_writer)
+#     writer.writerow(constants.CSV_HEADER)
 
-    # write the data
-    for date, data in sorted(entries.items()):
-        payload = data
-        payload.insert(0, date)
-        writer.writerow(payload)
-        # print(date, data)
+#     # write the data
+#     for date, data in sorted(entries.items()):
+#         payload = data
+#         payload.insert(0, date)
+#         writer.writerow(payload)
+#         # print(date, data)

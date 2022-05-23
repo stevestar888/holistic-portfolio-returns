@@ -1,33 +1,22 @@
 import pdftotext
-import os
 import re
 import constants
-import csv
 
 # unable to support deposit & withdrawls right now -- only account value
 
-PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Robinhood Statements/"
 
-entries = {}
-
-def bookkeep_month_entry(broker, date, account_value, deposits, withdraws):
-    entries[date] = [deposits, withdraws, account_value]
-
-
-def parse_date(date):
-    try:
-        parts = date.split("/")
-        month, day, year = parts
-        return "{}-{}".format(year, month)
-    except:
-        raise ValueError("failed splitting date")
+# def parse_date(date):
+#     try:
+#         parts = date.split("/")
+#         month, day, year = parts
+#         return "{}-{}".format(year, month)
+#     except:
+#         raise ValueError("failed splitting date")
 
 
-def parse_statement(broker, pdf_path):
-    # Load your PDF
+def parse_statement(pdf_path):
     with open(pdf_path, "rb") as f:
         pdf = pdftotext.PDF(f)
-        pages = len(pdf)
 
     try:
         # get account value & date
@@ -68,33 +57,32 @@ def parse_statement(broker, pdf_path):
         print(err.args)
 
     ### too difficult to extract deposits / withdrawls ###
-
-    bookkeep_month_entry(broker, friendly_date, account_value, 0, 0)
-
-
-files = os.listdir(PATH_TO_BROKERAGE_STATEMENTS)
-print(files)
-
-for file in files:
-    try:
-        # if file[-4:] == ".pdf" and file[:4] != "2019": #last 4 chars & not 2019
-        if file[-4:] == ".pdf": #last 4 chars
-            # continue
-            print("now parsing {}, which is found at {}".format(file, PATH_TO_BROKERAGE_STATEMENTS + file))
-            parse_statement("Schwab", PATH_TO_BROKERAGE_STATEMENTS + file)
-    except ValueError as err:
-        print("opening file")
-        print(err.args)
+    return (friendly_date, [" - ", " - ", account_value])
 
 
-header = ['year-month', 'deposits', 'withdrawals', 'ending_balance']
+# files = os.listdir(PATH_TO_BROKERAGE_STATEMENTS)
+# print(files)
 
-with open('data-robinhood.csv', 'w') as csv_writer:
-    writer = csv.writer(csv_writer)
-    writer.writerow(header)
+# for file in files:
+#     try:
+#         # if file[-4:] == ".pdf" and file[:4] != "2019": #last 4 chars & not 2019
+#         if file[-4:] == ".pdf": #last 4 chars
+#             # continue
+#             print("now parsing {}, which is found at {}".format(file, PATH_TO_BROKERAGE_STATEMENTS + file))
+#             parse_statement("Schwab", PATH_TO_BROKERAGE_STATEMENTS + file)
+#     except ValueError as err:
+#         print("opening file")
+#         print(err.args)
 
-    # write the data
-    for date, data in sorted(entries.items()):
-        payload = data
-        payload.insert(0, date)
-        writer.writerow(payload)
+
+# header = ['year-month', 'deposits', 'withdrawals', 'ending_balance']
+
+# with open('data-robinhood.csv', 'w') as csv_writer:
+#     writer = csv.writer(csv_writer)
+#     writer.writerow(header)
+
+#     # write the data
+#     for date, data in sorted(entries.items()):
+#         payload = data
+#         payload.insert(0, date)
+#         writer.writerow(payload)

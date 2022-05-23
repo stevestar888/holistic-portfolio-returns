@@ -1,20 +1,8 @@
 import pdftotext
-import os
 import re
 import constants
-import csv
 
-PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab Roth IRA Statements/"
-# PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Dad Taxable/"
-
-# PATH_TO_BROKERAGE_STATEMENTS = "../Brokerage Statements/Schwab 401k Statements/"
 IS_PCRA = False
-
-
-entries = {}
-
-def bookkeep_month_entry(broker, date, account_value, deposits, withdraws):
-    entries[date] = [deposits, withdraws, account_value]
 
 
 def parse_date(date):
@@ -26,7 +14,7 @@ def parse_date(date):
         raise ValueError("failed splitting date")
 
 
-def parse_statement(broker, pdf_path):
+def parse_statement(pdf_path):
     # Load your PDF
     with open(pdf_path, "rb") as f:
         pdf = pdftotext.PDF(f)
@@ -78,29 +66,4 @@ def parse_statement(broker, pdf_path):
         print("deposit / withdraw")
         print(err.args)
 
-    bookkeep_month_entry(broker, parsed_date, account_value, deposit_amount, withdrawal_amount)
-
-
-files = os.listdir(PATH_TO_BROKERAGE_STATEMENTS)
-print(files)
-
-for file in files:
-    try:
-        if file[-4:] == ".pdf": #last 4 chars
-            # continue
-            print("now parsing {}, which is found at {}".format(file, PATH_TO_BROKERAGE_STATEMENTS + file))
-            parse_statement("Schwab", PATH_TO_BROKERAGE_STATEMENTS + file)
-    except ValueError as err:
-        print("opening file")
-        print(err.args)
-
-
-with open('data-schwab.csv', 'w') as csv_writer:
-    writer = csv.writer(csv_writer)
-    writer.writerow(constants.CSV_HEADER)
-
-    # write the data
-    for date, data in sorted(entries.items()):
-        payload = data
-        payload.insert(0, date)
-        writer.writerow(payload)
+    return (parsed_date, [deposit_amount, withdrawal_amount, account_value])
