@@ -105,9 +105,10 @@ ROBINHOOD_STATEMENTS = "../Brokerage Statements/Robinhood Statements/"
 # variable_for_account.export_data_to_csv()
 
 # REAL EXAMPLE
-schwab_roth_ira = StatementParser(SCHWAB, "Schwab Roth IRA", SCHWAB_RIRA_STATEMENTS)
-schwab_roth_ira.export_data_to_csv()
-schwab_roth_ira.calculate_returns()
+# schwab_roth_ira = StatementParser(SCHWAB, "Schwab Roth IRA", SCHWAB_RIRA_STATEMENTS)
+# schwab_roth_ira.export_data_to_csv()
+# schwab_roth_ira.calculate_returns()
+
 
 # test = StatementParser(PUBLIC, "test", "../Brokerage Statements/test/")
 # test.export_data_to_csv()
@@ -116,14 +117,13 @@ schwab_roth_ira.calculate_returns()
 
 # fid = StatementParser(FIDELITY, "Fid2021", "../Brokerage Statements/Fidelity Statements/2021 Monthly/")
 # fid.export_data_to_csv()
-# fid.info()
+# test.calculate_returns()
 
 
 # pub = StatementParser(PUBLIC, "public.com", PUBLIC_STATEMENTS)
 # pub.export_data_to_csv()
-# pub.info()
+# pub.calculate_returns()
 
 
 # rh = StatementParser(ROBINHOOD, "rh", ROBINHOOD_STATEMENTS)
 # rh.export_data_to_csv()
-# rh.info()
