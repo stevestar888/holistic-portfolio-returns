@@ -7,8 +7,8 @@ import calc_money_weighted_returns
 # CSV_FILE_TO_READ = "data-schwab.csv"
 # CSV_FILE_TO_READ = "account-data_public.com.csv"
 
-SHOW_DEFINITIONS = True
-SHOW_EXAMPLES = True
+SHOW_DEFINITIONS = False
+SHOW_EXAMPLES = False
 
 
 def convert_to_float(text):
