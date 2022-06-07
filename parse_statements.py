@@ -53,9 +53,6 @@ class StatementParser:
 
                     key = entry[0]
                     payload = entry[1]
-                    # print(key)
-                    # print(payload)
-                    # print("\n")
 
                     self.entries[key] = payload
 
@@ -120,9 +117,9 @@ ROBINHOOD_STATEMENTS = "../Brokerage Statements/Robinhood Statements/"
 # test.calculate_returns()
 
 
-# pub = StatementParser(PUBLIC, "public.com", PUBLIC_STATEMENTS)
-# pub.export_data_to_csv()
-# pub.calculate_returns()
+pub = StatementParser(PUBLIC, "public.com", PUBLIC_STATEMENTS)
+pub.export_data_to_csv()
+pub.calculate_returns()
 
 
 # rh = StatementParser(ROBINHOOD, "rh", ROBINHOOD_STATEMENTS)
