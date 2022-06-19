@@ -2,8 +2,6 @@ import pdftotext
 import re
 import constants
 
-IS_PCRA = False
-
 
 def parse_date(date):
     try:
@@ -14,7 +12,7 @@ def parse_date(date):
         raise ValueError("failed splitting date")
 
 
-def parse_statement(pdf_path):
+def parse_statement(pdf_path, is_PCRA):
     # Load your PDF
     with open(pdf_path, "rb") as f:
         pdf = pdftotext.PDF(f)
@@ -22,7 +20,7 @@ def parse_statement(pdf_path):
 
     try:
         # get account value & date
-        if IS_PCRA:
+        if is_PCRA:
             account_value_pdf_page = pdf[constants.SCHWAB_PCRA_401K_ACCOUNT_VALUE_PAGE]
         else: 
             account_value_pdf_page = pdf[constants.SCHWAB_ACCOUNT_VALUE_PAGE]
