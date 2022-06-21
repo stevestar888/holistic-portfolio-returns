@@ -7,7 +7,7 @@ import calc_money_weighted_returns
 # CSV_FILE_TO_READ = "data-schwab.csv"
 # CSV_FILE_TO_READ = "account-data_public.com.csv"
 
-SHOW_DEFINITIONS = False
+SHOW_DEFINITIONS = True
 SHOW_EXAMPLES = False
 
 
@@ -21,7 +21,7 @@ def convert_to_float(text):
         return 0
 
 
-def calc_returns(entries, broker, account_nickname="investment-account"):
+def parse_statement_data(entries, contains_full_history):
     inflows = []
     outflows = []
     cash_flows = []
@@ -36,7 +36,7 @@ def calc_returns(entries, broker, account_nickname="investment-account"):
 
     num_of_months = len(entries)
 
-    count = 0
+    count = 0 #one indexed
     for date, row in sorted(entries.items()):
         count += 1
         # if broker == FIDELITY:
@@ -45,11 +45,14 @@ def calc_returns(entries, broker, account_nickname="investment-account"):
 
         payload = row #the rows here already have the date as a column
 
-        if not starting_balance:
-            starting_balance = convert_to_float(payload[constants.HEADER_ACCOUNT_VALUE_INDEX])
+        if count == 1: #on the first row
             starting_date = payload[constants.HEADER_DATE_INDEX]
-            prev_month_balance = convert_to_float(payload[constants.HEADER_ACCOUNT_VALUE_INDEX])
-            continue
+            prev_month_balance = 0 # not sure why I coded this var
+            if contains_full_history:
+                starting_balance = 0
+            else: #use the first month's ending balance; this, unfortunately, means we don't use the month's other data
+                starting_balance = convert_to_float(payload[constants.HEADER_ACCOUNT_VALUE_INDEX])
+                continue
 
         if count == num_of_months:
             ending_balance = convert_to_float(payload[constants.HEADER_ACCOUNT_VALUE_INDEX])
@@ -60,7 +63,9 @@ def calc_returns(entries, broker, account_nickname="investment-account"):
         
         inflows.append(inflow)
         outflows.append(outflow)
-        cash_flows.append(inflow - outflow)
+
+        cf = round(inflow - outflow, 2)
+        cash_flows.append(cf)
 
         # for Arithmetic Mean return
         if prev_month_balance > 0:
@@ -70,8 +75,13 @@ def calc_returns(entries, broker, account_nickname="investment-account"):
             monthly_HPRs.append(0)
         prev_month_balance = convert_to_float(payload[constants.HEADER_ACCOUNT_VALUE_INDEX])
 
-        # return (starting_balance, ending_balance, starting_date, ending_date)
+    return (inflows, outflows, cash_flows, monthly_HPRs, num_of_months, 
+            starting_balance, ending_balance, starting_date, ending_date)
 
+
+def calc_returns(entries, broker, contains_full_history, account_nickname="investment-account"):
+    parsed_data = parse_statement_data(entries, contains_full_history)
+    inflows, outflows, cash_flows, monthly_HPRs, num_of_months, starting_balance, ending_balance, starting_date, ending_date = parsed_data
 
     output_name = "returns_{}.txt".format(account_nickname)
     with open(output_name, 'w') as writer:
@@ -87,9 +97,10 @@ def calc_returns(entries, broker, account_nickname="investment-account"):
         write("---------------------------")
 
         # Calculate deposit & withdrawals
-        write("Inflows: {}".format(inflows), 3)
-        write("Outflows: {}".format(outflows), 2)
-        write("Net cash flows: {}".format(cash_flows), 2)
+        write("# of months: {}".format(num_of_months), 2)
+        write("Inflows: {}".format(inflows), 1)
+        write("Outflows: {}".format(outflows), 1)
+        write("Net cash flows: {}".format(cash_flows), 1)
 
         write("Account Starting Value: {}".format(starting_balance), 3)
         if SHOW_DEFINITIONS:
@@ -97,15 +108,15 @@ def calc_returns(entries, broker, account_nickname="investment-account"):
 
         write("Account Ending Value: {}".format(ending_balance), 2)
         if SHOW_DEFINITIONS:
-            write("  (the ending value of the account at {})".format(ending_balance))
+            write("  (the ending value of the account at {})".format(ending_date))
 
         write("Total change in account value: {}".format(ending_balance - starting_balance), 2)
         if SHOW_DEFINITIONS:
             write("  (change in the account's value over {} months)".format(num_of_months))
 
 
-        contributions = sum(inflows)
-        withdrawals = sum(outflows)
+        contributions = round(sum(inflows), 2)
+        withdrawals = round(sum(outflows), 2)
         net_contributions = contributions - withdrawals
         ending_balance_net_of_contributions = ending_balance - net_contributions
 
@@ -142,17 +153,24 @@ def calc_returns(entries, broker, account_nickname="investment-account"):
             starting_date, ending_date
         ), 2)
 
-        holding_period_return = ending_balance / starting_balance - 1
-        write("Holding Period Return (HPR): {}%".format(holding_period_return), 2)
-        if SHOW_DEFINITIONS:
-            write("  (% change of the account balance from the beginning of the holding period ({}) to the end of the holding period({}))".format(
-                starting_date, ending_date
-            ))
+        if starting_balance > 0:
+            holding_period_return = ending_balance / starting_balance - 1
+            write("Holding Period Return (HPR): {}%".format(holding_period_return), 2)
+            if SHOW_DEFINITIONS:
+                write("  (% change of the account balance from the beginning of the holding period ({}) to the end of the holding period({}))".format(
+                    starting_date, ending_date
+                ))
+        else:
+            write("(Holding Period Return (HPR) is not meaningful because the account started with $0", 2)
 
-        adjusted_HPR = ending_balance_net_of_contributions / starting_balance - 1
-        write("Adjusted HPR (ending balance is adjusted for deposits/withdrawals): {}%".format(adjusted_HPR), 2)
-        if SHOW_DEFINITIONS:
-            write("  (% change of the account balance from the holding period return like above, but adjusted so that the ending balance is adjusted for deposits/withdrawals)")
+
+        if starting_balance > 0:
+            adjusted_HPR = ending_balance_net_of_contributions / starting_balance - 1
+            write("Adjusted HPR (ending balance is adjusted for deposits/withdrawals): {}%".format(adjusted_HPR), 2)
+            if SHOW_DEFINITIONS:
+                write("  (% change of the account balance from the holding period return like above, but adjusted so that the ending balance is adjusted for deposits/withdrawals)")
+        else:
+            write("(Adjusted HPR is not meaningful because the account started with $0", 2)
 
 
         write("For the following calculations, every holding period is 1 month (making for a total of {} periods). As such, we need to multiply each holding period return by 12 to annualize it".format(num_of_months), 4)

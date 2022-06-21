@@ -9,6 +9,10 @@ import os
 import constants
 import csv
 
+# these are constants but they are coded so the input section is easier to understand
+CONTAINS_FULL_HISTORY = True
+CONTAINS_PARTIAL_HISTORY = False
+
 # currently supported brokerages:
 SCHWAB = "Schwab"
 FIDELITY = "Fidelity"
@@ -21,12 +25,16 @@ SOFI = "Sofi"
 WEBULL = "Webull"
 
 
+# Special modifiers (all start with "_")
+_SCHWAB_401k = True
 class StatementParser:
-    def __init__(self, broker, nickname, files_path):
+    def __init__(self, broker, nickname, files_path, contains_full_history, special_modifiers=None):
         self.broker = broker
         self.account_nickname = nickname
         self.files_path = files_path
         self.entries = {}
+        self.contains_full_history = contains_full_history
+        self.special_modifiers = special_modifiers if special_modifiers else []
 
         self.parse_statements()
 
@@ -40,7 +48,8 @@ class StatementParser:
                         self.broker, file, self.files_path + file))
                     
                     if self.broker == SCHWAB:
-                        entry = parse_schwab.parse_statement(self.files_path + file)
+                        is_PCRA = _SCHWAB_401k in self.special_modifiers
+                        entry = parse_schwab.parse_statement(self.files_path + file, is_PCRA)
                     elif self.broker == FIDELITY:
                         entry = parse_fidelity.parse_statement(self.files_path + file)
                     elif self.broker in [PUBLIC, WEBULL, FIRSTRADE, SOFI]:
@@ -65,7 +74,8 @@ class StatementParser:
 
 
     def calculate_returns(self):
-        calculate_holistic_returns.calc_returns(self.entries, self.broker, self.account_nickname)
+        calculate_holistic_returns.calc_returns(
+            self.entries, self.broker, self.contains_full_history, self.account_nickname)
 
 
     def export_data_to_csv(self):
@@ -98,13 +108,30 @@ ROBINHOOD_STATEMENTS = "../Brokerage Statements/Robinhood Statements/"
 
 
 # EXAMPLE
-# variable_for_account = StatementParser(SCHWAB FIDELITY ROBINHOOD etc, "nickname", "path_to_the_folder_containing_statements")
-# variable_for_account.export_data_to_csv()
+# account_name = StatementParser(SCHWAB FIDELITY ROBINHOOD etc, "nickname", "path_to_the_folder_containing_statements", contains_full_history, [any special modifiers])
+# account_name.export_data_to_csv()
+# account_name.calculate_returns()
 
-# REAL EXAMPLE
-# schwab_roth_ira = StatementParser(SCHWAB, "Schwab Roth IRA", SCHWAB_RIRA_STATEMENTS)
-# schwab_roth_ira.export_data_to_csv()
-# schwab_roth_ira.calculate_returns()
+"""
+Arguments:
+
+    CONTAINS_FULL_HISTORY: do the statements start since the beginning of the account?
+        • this affects the returns calculations
+        • if true, starting_balance = 0
+        • if false, starting_balance = the first month's ending balance, but this means we will lose out on that month's data since that month's inflow/outflow data will not be used
+
+"""
+
+schwab_roth_ira = StatementParser(
+    SCHWAB, "Schwab Roth Test", SCHWAB_RIRA_STATEMENTS, CONTAINS_FULL_HISTORY)
+schwab_roth_ira.export_data_to_csv()
+schwab_roth_ira.calculate_returns()
+
+
+# schwab_roth_401k = StatementParser(
+#     SCHWAB, "Schwab 401k", SCHWAB_401K_STATEMENTS, CONTAINS_FULL_HISTORY, [_SCHWAB_401k])
+# schwab_roth_401k.export_data_to_csv()
+# schwab_roth_401k.calculate_returns()
 
 
 # test = StatementParser(PUBLIC, "test", "../Brokerage Statements/test/")
@@ -117,10 +144,10 @@ ROBINHOOD_STATEMENTS = "../Brokerage Statements/Robinhood Statements/"
 # test.calculate_returns()
 
 
-pub = StatementParser(PUBLIC, "public.com", PUBLIC_STATEMENTS)
-pub.export_data_to_csv()
-pub.calculate_returns()
+# pub = StatementParser(PUBLIC, "public.com", PUBLIC_STATEMENTS)
+# pub.export_data_to_csv()
+# pub.calculate_returns()
 
 
-# rh = StatementParser(ROBINHOOD, "rh", ROBINHOOD_STATEMENTS)
+# rh = StatementParser(ROBINHOOD, "rh indiv", ROBINHOOD_STATEMENTS, CONTAINS_FULL_HISTORY)
 # rh.export_data_to_csv()
