@@ -147,7 +147,7 @@ ACH DEPOSIT
 MONEY_WEIGHTED_RETURNS_EXAMPLE = """
 Ex1: Starting Balance = 100, Ending Balance = 1000
 Holding Period #		Deposits		Withdrawals
-1						1000			0
+1						1000 			0
 2						0				50
 3						0				100
 4						20				200
@@ -160,7 +160,8 @@ Calculations
 + 1000 / (1 + IRR)^1 
 - 50 / (1 + IRR)^2
 - 100 / (1 + IRR)^3
-+ 20 / (1 + IRR)^4  -  200 / (1 + IRR)^4
++ 20 / (1 + IRR)^4
+- 200 / (1 + IRR)^4
 =
 1000 / (1 + IRR)^5	        # ending account balance
 
