@@ -16,7 +16,7 @@ Portfolio return calculations are based on the same information in the .csv file
 Currently, it supports: \
 • Schwab \
 • Robinhood (only account value and date, not withdrawals or contributions) \
-• Brokers who use Apex Clearing (which includes Public, Firstrade, M1, Sofi, Webull, Ally, Bettermint, Axos, Wealthsimple, etc.; for the full list, see https://investorjunkie.com/stock-brokers/broker-clearing-firms/)
+• Brokers who use Apex Clearing (which includes Public.com, Firstrade, M1, Sofi, Webull, Ally, Bettermint, Axos, Wealthsimple, Tradier, TradingBlock, ViewTrade, LevelX, TradeZero, Gatsby, Farther Finance, etc.; for the full list, see https://investorjunkie.com/stock-brokers/broker-clearing-firms/)
 
 Planning to support: \
 • TDAmeritrade \
