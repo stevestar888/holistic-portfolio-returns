@@ -10,7 +10,7 @@ INITIAL_UPPER_RETURN_BOUND = 50.0 #upper bound of returns, measured in %
 
 # example
 """
-This comes from CFA level 1, Kaplan book 5 page #17-18. 
+This comes from Kaplan May 2022 CFA level 1 Book 5 pages #17-18. 
 t0: purchase 1 share for $100
 t1: purchase another share for $120, but share from t0 paid a $2 dividend
     -> inflow of $120-$118=$2
@@ -47,16 +47,16 @@ def apply_discount_rate(cash_flow, discount_rate, period):
     return cash_flow / (1 + discount_rate) ** period
 
 
-def calc_discounted_cash_flows(starting_balance, cash_flows, ending_balance, r):
+def calc_discounted_cash_flows(starting_balance, cash_flows, ending_balance, discount_rate):
     cumulative = starting_balance
-    r = r / 100 #convert percent into decimal
+    discount_rate = discount_rate / 100 #convert percent into decimal
     t = 1 #starts at 1 because starting_balance was t=0
 
     for cf in cash_flows:
-        cumulative += apply_discount_rate(cf, r, t)
+        cumulative += apply_discount_rate(cf, discount_rate, t)
         t += 1
 
-    ending = apply_discount_rate(ending_balance, r, t)
+    ending = apply_discount_rate(ending_balance, discount_rate, t)
     return(cumulative, ending)
 
 
@@ -86,6 +86,13 @@ def estab_initial_return_bounds(starting_balance, cash_flows, ending_balance):
 
 
 def calc_money_weighted_return(starting_balance, cash_flows, ending_balance):
+    """
+    The basic question we are trying to answer is what is the discount rate that should be applied to both the cash_flows and ending_balance such that they will equal?
+    
+    cummulative: PV(future cash flows)
+    ending: 
+    
+    """
     lower, upper = estab_initial_return_bounds(starting_balance, cash_flows, ending_balance)
 
     while lower <= upper:
@@ -98,18 +105,35 @@ def calc_money_weighted_return(starting_balance, cash_flows, ending_balance):
             # print("finished with error of {}".format(current_error))
             # print("rate of return of {}%".format(mid))
             # print("cumulative, ending", cumulative, ending)
-            return round(mid, 2)
+            return round(mid, 4)
 
         if cumulative > ending: #r is too high
             upper = mid
         else: #r is not high enough
             lower = mid
 
+# SIGNIFICANT_FIGURES = 2 + 4
+DECIMALS_TO_SHOW = 4
 
-
+# Kaplan book
 # starting_balance = 900.0
 # cash_flows = [100, -1004, 1020, -1500, 1200, -1001]
 # ending_balance = 900.0
 
-# money_weighted_return = calc_money_weighted_return(starting_balance, cash_flows, ending_balance)
-# print(money_weighted_return, "%")
+# Kaplan Q-Bank
+starting_balance = 550
+cash_flows = [-65]*5 + [-50]*3
+ending_balance = 350
+
+# CFI
+# starting_balance = 100
+# cash_flows = [-5,-5]
+# ending_balance = 150 + 5
+
+# Investopedia
+# starting_balance = 50
+# cash_flows = [-2, -2]
+# ending_balance = 65
+
+money_weighted_return = calc_money_weighted_return(starting_balance, cash_flows, ending_balance)
+print(money_weighted_return, "%")
